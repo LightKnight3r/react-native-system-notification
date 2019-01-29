@@ -43,6 +43,7 @@ public class NotificationEventReceiver extends BroadcastReceiver {
 
             context.startActivity(launchIntent);
             Log.i("ReactSystemNotification", "NotificationEventReceiver: Launching: " + packageName);
+            sendBroadcast(context, extras);
         } else {
             sendBroadcast(context, extras); // If the application is already running in foreground, send a brodcast too
         }

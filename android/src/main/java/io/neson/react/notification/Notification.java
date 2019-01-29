@@ -34,6 +34,7 @@ import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.graphics.Color;
+import android.media.AudioAttributes;
 
 /**
  * An object-oriented Wrapper class around the system notification class.
@@ -46,7 +47,7 @@ public class Notification {
     private String id;
     private int subId;
     private NotificationAttributes attributes;
-    private static final String CHANNEL_ID = "channel_sysnotify";
+    private static final String CHANNEL_ID = "channel_normal_sysnotify";
 
     /**
      * Constructor.
@@ -126,20 +127,32 @@ public class Notification {
     /**
      * Build the notification.
      */
-     private void createChannel() {
+     public void createChannel() {
          if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
            return;
          NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
          // The id of the channel.
          String id = CHANNEL_ID;
+
          // The user-visible name of the channel.
-         CharSequence name = "rn-sysnotify-android";
+         CharSequence name = "Thông báo SS-HeyU";
          int importance = NotificationManager.IMPORTANCE_HIGH;
          NotificationChannel mChannel = new NotificationChannel(id, name, importance);
+         AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .build();
+         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+         Log.i("ReactSystemNotification",soundUri.toString());
+         if("default_rington".equals(attributes.sound)){
+             soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+         }
          // Configure the notification channel.
          //mChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
          mChannel.enableLights(true);
          mChannel.enableVibration(true);
+         mChannel.setLightColor(Color.BLUE);
+         mChannel.setSound(soundUri, audioAttributes);
          mNotificationManager.createNotificationChannel(mChannel);
      }
 
