@@ -32,7 +32,7 @@ public class BackgroundService extends Service {
         mReactInstanceManager = ReactInstanceManager.builder()
                 .setApplication(getApplication())
                 .setBundleAssetName("index.android.bundle")
-                .setJSMainModuleName("index.android")
+                //.setJSMainModuleName("index.android")
                 .addPackage(new MainReactPackage())
                 .addPackage(new NotificationPackage(intent))
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
