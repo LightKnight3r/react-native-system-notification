@@ -29,7 +29,7 @@ import io.neson.react.notification.NotificationPublisher;
 
 import java.util.Random;
 import android.util.Base64;
-import android.support.v7.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
