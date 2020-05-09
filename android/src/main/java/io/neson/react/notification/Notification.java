@@ -185,7 +185,7 @@ public class Notification {
 
         if(attributes.inboxStyle){
 
-            android.support.v7.app.NotificationCompat.InboxStyle inboxStyle = new android.support.v7.app.NotificationCompat.InboxStyle();
+            androidx.core.app.NotificationCompat.InboxStyle inboxStyle = new androidx.core.app.NotificationCompat.InboxStyle();
 
             if(attributes.inboxStyleBigContentTitle != null){
                 inboxStyle.setBigContentTitle(attributes.inboxStyleBigContentTitle);
@@ -237,7 +237,7 @@ public class Notification {
         // if bigText is not null, it have priority over bigStyleImageBase64
         if (attributes.bigText != null) {
             notificationBuilder
-              .setStyle(new android.support.v7.app.NotificationCompat.BigTextStyle()
+              .setStyle(new androidx.core.app.NotificationCompat.BigTextStyle()
               .bigText(attributes.bigText));
         }
         else if (attributes.bigStyleUrlImgage != null && attributes.bigStyleUrlImgage != "") {
