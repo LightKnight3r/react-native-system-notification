@@ -15,6 +15,9 @@ import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.net.Uri;
 import android.app.NotificationChannel;
+import android.content.ContentResolver;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 
 import java.lang.System;
 import java.net.URL;
@@ -29,7 +32,7 @@ import io.neson.react.notification.NotificationPublisher;
 
 import java.util.Random;
 import android.util.Base64;
-import androidx.core.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
@@ -47,7 +50,7 @@ public class Notification {
     private String id;
     private int subId;
     private NotificationAttributes attributes;
-    private static final String CHANNEL_ID = "channel_normal_sysnotify";
+    private static String CHANNEL_ID = "channel_heyu_sysnotify_channel";
 
     /**
      * Constructor.
@@ -132,8 +135,8 @@ public class Notification {
            return;
          NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
          // The id of the channel.
-         String id = CHANNEL_ID;
-
+         String id = CHANNEL_ID + attributes.sound;
+         CHANNEL_ID = CHANNEL_ID + attributes.sound;
          // The user-visible name of the channel.
          CharSequence name = "Thông báo SS-HeyU";
          int importance = NotificationManager.IMPORTANCE_HIGH;
@@ -143,10 +146,17 @@ public class Notification {
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                 .build();
          Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-         Log.i("ReactSystemNotification",soundUri.toString());
+         Log.i("ahihiReactSystemNotification",soundUri.toString());
+         Log.i("ahihiReactSystemNotification",attributes.sound);
+
          if("default_rington".equals(attributes.sound)){
              soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+         } else if(!attributes.sound.equals("default")) {
+             int resId = context.getResources().getIdentifier(attributes.sound, "raw", context.getPackageName());
+             soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + resId);
          }
+         Log.i("ahihiReactSystemNotification",soundUri.toString());
+
          // Configure the notification channel.
          //mChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
          mChannel.enableLights(true);
@@ -185,7 +195,7 @@ public class Notification {
 
         if(attributes.inboxStyle){
 
-            androidx.core.app.NotificationCompat.InboxStyle inboxStyle = new androidx.core.app.NotificationCompat.InboxStyle();
+            android.support.v4.app.NotificationCompat.InboxStyle inboxStyle = new android.support.v4.app.NotificationCompat.InboxStyle();
 
             if(attributes.inboxStyleBigContentTitle != null){
                 inboxStyle.setBigContentTitle(attributes.inboxStyleBigContentTitle);
@@ -237,7 +247,7 @@ public class Notification {
         // if bigText is not null, it have priority over bigStyleImageBase64
         if (attributes.bigText != null) {
             notificationBuilder
-              .setStyle(new androidx.core.app.NotificationCompat.BigTextStyle()
+              .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle()
               .bigText(attributes.bigText));
         }
         else if (attributes.bigStyleUrlImgage != null && attributes.bigStyleUrlImgage != "") {
@@ -310,9 +320,23 @@ public class Notification {
             notificationBuilder.setSound(Uri.parse(attributes.sound));
         }
 
-
+        wakeScreen();
 
         return notificationBuilder.build();
+    }
+
+    public void wakeScreen() {
+      PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
+      boolean isScreenOn = pm.isScreenOn();
+      Log.e("screen on.................................", ""+isScreenOn);
+      if(isScreenOn==false)
+      {
+          WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK |PowerManager.ACQUIRE_CAUSES_WAKEUP |PowerManager.ON_AFTER_RELEASE,"MyLock");
+          wl.acquire(10000);
+          WakeLock wl_cpu = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MyCpuLock");
+
+          wl_cpu.acquire(10000);
+      }
     }
 
     /**
