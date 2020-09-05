@@ -50,7 +50,7 @@ public class Notification {
     private String id;
     private int subId;
     private NotificationAttributes attributes;
-    private static String CHANNEL_ID = "channel_heyu_sysnotify_channel";
+    private static String CHANNEL_ID;
 
     /**
      * Constructor.
@@ -135,6 +135,7 @@ public class Notification {
            return;
          NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
          // The id of the channel.
+         CHANNEL_ID = "channel_heyu_sysnotify_channel";
          String id = CHANNEL_ID + attributes.sound;
          CHANNEL_ID = CHANNEL_ID + attributes.sound;
          // The user-visible name of the channel.
@@ -146,8 +147,6 @@ public class Notification {
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                 .build();
          Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-         Log.i("ahihiReactSystemNotification",soundUri.toString());
-         Log.i("ahihiReactSystemNotification",attributes.sound);
 
          if("default_rington".equals(attributes.sound)){
              soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
@@ -155,7 +154,6 @@ public class Notification {
              int resId = context.getResources().getIdentifier(attributes.sound, "raw", context.getPackageName());
              soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + resId);
          }
-         Log.i("ahihiReactSystemNotification",soundUri.toString());
 
          // Configure the notification channel.
          //mChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
@@ -167,6 +165,7 @@ public class Notification {
      }
 
     public android.app.Notification build() {
+        CHANNEL_ID = "channel_heyu_sysnotify_channel";
         createChannel();
         android.support.v4.app.NotificationCompat.Builder notificationBuilder = new android.support.v4.app.NotificationCompat.Builder(context,CHANNEL_ID);
 
@@ -176,11 +175,10 @@ public class Notification {
             .setSmallIcon(context.getResources().getIdentifier(attributes.smallIcon, "mipmap", context.getPackageName()))
             .setAutoCancel(attributes.autoClear)
             .setContentIntent(getContentIntent())
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setChannelId(CHANNEL_ID);
 
-        if (attributes.priority != null) {
-            notificationBuilder.setPriority(attributes.priority);
-        }
+        notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
 
         if (attributes.largeIcon != null) {
             int largeIconId = context.getResources().getIdentifier(attributes.largeIcon, "drawable", context.getPackageName());
@@ -213,23 +211,24 @@ public class Notification {
 
             Log.i("ReactSystemNotification", "set inbox style!!");
 
-        }else{
-
-            int defaults = 0;
-            if ("default".equals(attributes.sound)) {
-                defaults = defaults | android.app.Notification.DEFAULT_SOUND;
-            }else if("default_rington".equals(attributes.sound)){
-                attributes.sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE).toString();
-            }
-            if ("default".equals(attributes.vibrate)) {
-                defaults = defaults | android.app.Notification.DEFAULT_VIBRATE;
-            }
-            if ("default".equals(attributes.lights)) {
-                defaults = defaults | android.app.Notification.DEFAULT_LIGHTS;
-            }
-            notificationBuilder.setDefaults(defaults);
-
         }
+        // else{
+        //
+        //     int defaults = 0;
+        //     if ("default".equals(attributes.sound)) {
+        //         defaults = defaults | android.app.Notification.DEFAULT_SOUND;
+        //     }else if("default_rington".equals(attributes.sound)){
+        //         attributes.sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE).toString();
+        //     }
+        //     if ("default".equals(attributes.vibrate)) {
+        //         defaults = defaults | android.app.Notification.DEFAULT_VIBRATE;
+        //     }
+        //     if ("default".equals(attributes.lights)) {
+        //         defaults = defaults | android.app.Notification.DEFAULT_LIGHTS;
+        //     }
+        //     notificationBuilder.setDefaults(defaults);
+        //
+        // }
 
         if (attributes.onlyAlertOnce != null) {
             notificationBuilder.setOnlyAlertOnce(attributes.onlyAlertOnce);
@@ -315,9 +314,16 @@ public class Notification {
         if (attributes.localOnly != null) {
             notificationBuilder.setLocalOnly(attributes.localOnly);
         }
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
+        if("default_rington".equals(attributes.sound)){
+            soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        } else if(!attributes.sound.equals("default")) {
+            int resId = context.getResources().getIdentifier(attributes.sound, "raw", context.getPackageName());
+            soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + resId);
+        }
         if (attributes.sound != null) {
-            notificationBuilder.setSound(Uri.parse(attributes.sound));
+            notificationBuilder.setSound(soundUri);
         }
 
         wakeScreen();
